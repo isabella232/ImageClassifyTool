@@ -3,6 +3,7 @@ import pickle
 import os
 from os import listdir, getcwd
 from os.path import join
+import glob
 
 sets=[('2012', 'train'), ('2012', 'val'), ('2007', 'train'), ('2007', 'val'), ('2007', 'test')]
 
@@ -10,6 +11,14 @@ sets=[('2012', 'train'), ('2012', 'val'), ('2007', 'train'), ('2007', 'val'), ('
 
 classes = ["person", "car", "bicycle", "dog", "cat"]
 
+#workdir  = getcwd()
+workdir  = "datadetect"
+trainfname = "detecttrain.txt"
+testfname = "detecttest.txt"
+
+
+list_trainfile = open(trainfname, 'w')
+#list_testfile = open(testfname, 'w')
 
 def convert(size, box):
     dw = 1./size[0]
@@ -61,40 +70,63 @@ def getobjectpos(year, image_id):
         cls_id = classes.index(cls)
         xmlbox = obj.find('bndbox')
 
-        strtmp = xmlbox.find('xmin').text + "," + xmlbox.find('xmax').text + "," + \
-                 xmlbox.find('ymin').text + "," + xmlbox.find('ymax').text + "," + str(cls_id)
+        strtmp = xmlbox.find('xmin').text + "," + xmlbox.find('ymin').text + "," + \
+                 xmlbox.find('xmax').text + "," + xmlbox.find('ymax').text + "," + str(cls_id)
 
         strpos = strpos +  " " +  strtmp
 
     return strpos
 
+def test():
+    testdir = "data"
+    width = 1920
+    height = 1080
 
-#workdir  = getcwd()
-workdir  = "datadetect"
-trainfname = "detecttrain.txt"
-testfname = "detecttest.txt"
+    list_trainfile = open(trainfname, 'w')
 
+    fileset = [file for file in glob.glob(testdir + "**/*.jpg", recursive=True)]
+    count = len(fileset)
+    binit = False
 
-list_trainfile = open(trainfname, 'w')
-list_testfile = open(testfname, 'w')
+    for file in fileset:
+        fname = os.path.basename(file)
+        print(fname + ": ")
 
-for year, image_set in sets:
-    if not os.path.exists('VOCdevkit/VOC%s/labels/'%(year)):
-        os.makedirs('VOCdevkit/VOC%s/labels/'%(year))
-    image_ids = open('VOCdevkit/VOC%s/ImageSets/Main/%s.txt'%(year, image_set)).read().strip().split()
+        title = fname.split(".")[0]
+        posdata = testdir + "/" + title + ".txt"
 
-    btrain = True
-    if year == '2007' and  image_set == 'test': #make test dataset
-        btrain = False
+        fpos = open(posdata, 'r')
+        sline = fpos.readline()
+        fpos.close()
 
-    for image_id in image_ids:
-        fpath = '%s/VOCdevkit/VOC%s/JPEGImages/%s.jpg'%(workdir, year, image_id)
-        objpos = getobjectpos(year, image_id)
-        if len(objpos) > 0 and btrain == True:
-            list_trainfile.write(fpath+objpos+"\n")
-        elif len(objpos) > 0 and btrain == False:
-            list_testfile.write(fpath + objpos + "\n")
+        b = (
+        float(sline.split(" ")[1]), float(sline.split(" ")[2]), float(sline.split(" ")[3]), float(sline.split(" ")[4]))
+        bb = convert((width, height), b)
+        list_trainfile.write(file + " ".join([str(a) for a in bb]) + "0 \n")
 
-list_trainfile.close()
-list_testfile.close()
+        # start_time = time.time()
+    list_trainfile.close()
 
+def main():
+    for year, image_set in sets:
+        if not os.path.exists('VOCdevkit/VOC%s/labels/'%(year)):
+            os.makedirs('VOCdevkit/VOC%s/labels/'%(year))
+        image_ids = open('VOCdevkit/VOC%s/ImageSets/Main/%s.txt'%(year, image_set)).read().strip().split()
+
+        btrain = True
+        #if year == '2007' and  image_set == 'test': #make test dataset
+        #    btrain = False
+
+        for image_id in image_ids:
+            fpath = '%s/VOCdevkit/VOC%s/JPEGImages/%s.jpg'%(workdir, year, image_id)
+            objpos = getobjectpos(year, image_id)
+            if len(objpos) > 0 and btrain == True:
+                list_trainfile.write(fpath+objpos+"\n")
+            #elif len(objpos) > 0 and btrain == False:
+            #    list_testfile.write(fpath + objpos + "\n")
+
+    list_trainfile.close()
+    #list_testfile.close()
+
+if __name__== "__main__":
+    main()
