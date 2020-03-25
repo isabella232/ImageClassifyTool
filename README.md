@@ -182,19 +182,19 @@ python3 image_detect.py
 
 - cannot import cv2
 
-pip install opencv-python
+	pip install opencv-python
 
 - cannot import pandas
 
-pip install pandas
+	pip install pandas
 
 - cannot import scikit
 
-pip install scikit-learn
+	pip install scikit-learn
 
 - cannot import matplotlib
 
-pip install matplotlib
+	pip install matplotlib
 
 
 
