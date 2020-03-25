@@ -23,14 +23,23 @@ Now enter our ImageClassifyTool directory.
 	cd ImageClassifyTool
  
 dataclassify: image dataset directory for train classification model 
+
 datadetect: image dataset directory for train yolo detect model 
+
 model_data: trained model directory for test and training
+
 model_training: working directory while train model
+
 testclassify: test directory for image classification
+
 testdetect: test directory for object detect
+
 trainclassify.py: training python script for classification model
+
 traindetect.py: training python script for yolo model
+
 trainclassify.py: benchmark python script for classification
+
 trainclassify.py: benchmark python script for detection
 
 Train Image classification 
@@ -41,7 +50,9 @@ First, we need image data for training. As mentioned above there are several way
 Enter “dataclassify” directory.
  cd dataclassify
 Execute following python script.
+
  python3 imagedoenloder.py --urls=urls_2.txt --dir=class02
+ 
 This script download to class02 directory all images from URL list.
 And add images which downloaded from google image search and grabbed from video.
 At least 10k images are recommended for training.
@@ -51,7 +62,9 @@ At least 10k images are recommended for training.
 Once the image is ready, we have to split two set. One is train other one is validation set.
 In addition, for training we have to convert images to 224X224 pixel images. 
 Execute following python script.
+
 python3 imagesplitetrain.py --infolder class02 --classname 1
+
 After execute this script we can confirm “train” and “validation” directories.
 
  	Training the classifier
@@ -61,16 +74,22 @@ Now we can start training. Enter work root directory.
 python3 trainclassify.py --classes=2 --size=224 --batch=64 --epochs=100 --weights=False --tclasses=0
 
 --classes, The number of classes of dataset.
+
 --size, The image size of train sample.
+
 --batch, The number of train samples per batch.
+
 --epochs, The number of train iterations.
+
 --weights, Fine tune with other weights.
+
 --tclasses, The number of classes of pre-trained model.
 
 In our case –weights and –tclasses parameter is False and 0, because don’t use pre-trained model.
 If completed training then we can find trained model file in  “model_training/logclassify” directory.
 This file name is “trained_classifymodel.h5”. 
 For test we copy this file to “model_data” directory.
+
  
 cp model_training/logclassify/ trained_classifymodel.h5 directory model_data/trained_classifymodel.h5
 
@@ -128,6 +147,7 @@ Now we can start training. Enter work root directory.
 python3 traindetect.py
 
 If completed training then we can find trained model file in  “model_training/logdetect” directory.This file name is “trained_weights_final.h5”. 
+
 For test we copy this file to “model_data” directory.
  
 cp model_training/ logdetect/ trained_weights_final.h5 model_data/ yolo_trained_weights_final.h5
