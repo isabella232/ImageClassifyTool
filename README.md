@@ -101,6 +101,13 @@ Execute following python script.
 
 python3 image_classify.py
 
+ 	Calculate ROC and Threshold for classifier
+
+Need to install dependent python packages
+
+pip install scikit-learn
+
+python3 image_calcroc.py
 
 
 Yolo Training
