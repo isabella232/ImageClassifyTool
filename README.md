@@ -178,7 +178,7 @@ Execute following python script.
 
 python3 image_detect.py
 
-3. Trouble Shooting
+# 3. Trouble Shooting
 
 - cannot import cv2
 
