@@ -20,8 +20,10 @@ pip3 install tensorflow-gpu==1.15
 -	Install python opencv
 
 apt install python3-opencv
+
 Now enter our ImageClassifyTool directory.
-	cd ImageClassifyTool
+
+cd ImageClassifyTool
  
 dataclassify: image dataset directory for train classification model 
 
@@ -128,7 +130,7 @@ In this project used public data set called “VOC”. The Pascal VOC challenge 
 
 Enter “datadetect” directory.
 
- cd datadetect
+cd datadetect
 
 Download data using following command script. 
 
@@ -176,6 +178,23 @@ Execute following python script.
 
 python3 image_detect.py
 
+3. Trouble Shooting
+
+- cannot import cv2
+
+pip install opencv-python
+
+- cannot import pandas
+
+pip install pandas
+
+- cannot import scikit
+
+pip install scikit-learn
+
+- cannot import matplotlib
+
+pip install matplotlib
 
 
 
