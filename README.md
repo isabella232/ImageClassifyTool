@@ -4,6 +4,7 @@ Object Detection Prototype Spec
 Build Train and Test environment
 Bellow steps all tested on ubuntu18.04.
 In here recommend python anaconda environment.
+
 -	First install python 3.6 or later.
 
 	sudo apt install python3.6
@@ -42,7 +43,7 @@ trainclassify.py: benchmark python script for classification
 
 trainclassify.py: benchmark python script for detection
 
-Train Image classification 
+1. Train Image classification 
 
  	Data collection
 
@@ -110,7 +111,7 @@ pip install scikit-learn
 python3 image_calcroc.py
 
 
-Yolo Training
+2. Yolo Training
 
  	Data collection
 
