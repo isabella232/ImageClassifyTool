@@ -43,7 +43,9 @@ trainclassify.py: benchmark python script for classification
 
 trainclassify.py: benchmark python script for detection
 
-1. Train Image classification 
+
+1. Train Image classification
+
 
  	Data collection
 
@@ -111,7 +113,9 @@ pip install scikit-learn
 python3 image_calcroc.py
 
 
+
 2. Yolo Training
+
 
  	Data collection
 
