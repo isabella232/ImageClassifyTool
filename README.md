@@ -54,6 +54,8 @@ Enter “dataclassify” directory.
  cd dataclassify
 Execute following python script.
 
+ python3 imagedoenloder.py --urls=urls_1.txt --dir=class01
+
  python3 imagedoenloder.py --urls=urls_2.txt --dir=class02
  
 This script download to class02 directory all images from URL list.
@@ -65,6 +67,8 @@ At least 10k images are recommended for training.
 Once the image is ready, we have to split two set. One is train other one is validation set.
 In addition, for training we have to convert images to 224X224 pixel images. 
 Execute following python script.
+
+python3 imagesplitetrain.py --infolder class01 --classname 0
 
 python3 imagesplitetrain.py --infolder class02 --classname 1
 
