@@ -5,11 +5,15 @@ Build Train and Test environment
 Bellow steps all tested on ubuntu18.04.
 In here recommend python anaconda environment.
 -	First install python 3.6 or later.
+
 	sudo apt install python3.6
-sudo apt install -y python3-pip
+	
+	sudo apt install -y python3-pip
+	
 -	Install keras and tensorflow 1.15 gpu version
 
 pip3 install keras
+
 pip3 install tensorflow-gpu==1.15
 
 -	Install python opencv
