@@ -17,6 +17,10 @@ from distutils import spawn
 import glob
 import logging
 
+import matplotlib.pyplot as pp
+import sklearn.metrics as metrics
+from sklearn.metrics import accuracy_score,precision_score, recall_score
+
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
@@ -42,11 +46,16 @@ THESHOLD = 0.2
 #with open('model_data/class20.pickle','rb') as f:
 #    class20 = pickle.load(f)
 
+nload = 1
 print("Loading model...\n")
 
-model = MobileNetv2((224, 224, 3), 2)
+if nload > 0:
+    model = MobileNetv2((224, 224, 3), 2)
+    model.load_weights('model_data/trained_classifymodel.h5')
+
+
+#model.load_weights('model_training/logclassify/trained_weights_final.h5')
 #model.load_weights('model_data/trained_classify_final.h5',by_name=True)
-model.load_weights('model_data/trained_classifymodel.h5')
 #model = load_model('model_data/trained_classifymodel.h5')
 class20 = ["bad","football","other"]
 
@@ -180,91 +189,120 @@ def classifyimage(path):
     cv2.imshow('test', frame)
     cv2.destroyAllWindows()
 
+sets=[('dataclassify/validation/0', '1'), ('dataclassify/validation/1', '0')]
+label = []
+values = []
+
+def calcpredict():
+    for workdir, labelval in sets:
+
+        fileset = [file for file in glob.glob(workdir + "**/*.jpg", recursive=True)]
+
+        for file in fileset:
+            fname = os.path.basename(file)
+            print(fname + ": ")
+            start_time = time.time()
+            frame = cv2.imread(file)
+
+            img = cv2.resize(frame, (224, 224), fx=0.5, fy=0.5, interpolation=cv2.INTER_AREA)
+            # img = cv2.resize(frame, (224, 224), fx=0.0, fy=0.0, interpolation=cv2.INTER_AREA)
+            # img = cv2.resize(frame, (224, 224))
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            img = img / 255
+            expanded_img = np.expand_dims(img, axis=0)
+
+            # start_time = time.time()
+
+            pred = model.predict(expanded_img)
+
+            label.append(int(labelval))
+            values.append(pred[0][0])
+
+    alable = np.array(label)
+    ascores = np.array(values)
+
+    np.save('label.npy', alable)
+    np.save('scores.npy', ascores)
+
+def perf_measure(y_actual, y_hat):
+    TP = 0
+    FP = 0
+    TN = 0
+    FN = 0
+
+    for i in range(len(y_hat)):
+        if y_actual[i]==y_hat[i]==1:
+           TP += 1
+        if y_hat[i]==1 and y_actual[i]!=y_hat[i]:
+           FP += 1
+        if y_actual[i]==y_hat[i]==0:
+           TN += 1
+        if y_hat[i]==0 and y_actual[i]!=y_hat[i]:
+           FN += 1
+
+    return(TP, FP, TN, FN)
+
 def main():
     parser = argparse.ArgumentParser()
     # Required arguments.
     # parser.add_argument("--dir",default="testclassify",help="The number of classes of dataset.")
     args = parser.parse_args()
     # testdir = args.dir
-    testdir = "testclassify"
+    testdirtrue = "dataclassify/validation/0"
+    testdirfalse = "dataclassify/validation/1"
 
-    totaltime = 0
-    totalgusage = 0.0
-    totalgram = 0.0
-    totalgper = 0.0
-    totalcusage = 0.0
-    totalcram = 0.0
-    totalcper = 0.0
+    # prepare positive and negative array
+    calcpredict()
 
-    fileset = [file for file in glob.glob(testdir + "**/*.jpg", recursive=True)]
-    count = len(fileset) - 1
-    binit = False
+    alable = np.load('label.npy')
+    ascores = np.load('scores.npy')
 
-    for file in fileset:
+    afpr, atpr, thresholds = metrics.roc_curve(alable, ascores)
 
-        fname = os.path.basename(file)
-        print(fname + ": ")
+    arocauc = metrics.auc(afpr, atpr)
 
-        frame = cv2.imread(file)
+    pp.title("Receiver Operating Characteristic")
+    pp.xlabel("False Positive Rate(1 - Specificity)")
+    pp.ylabel("True Positive Rate(Sensitivity)")
+    pp.plot(afpr, atpr, "b", label="(AUC = %0.2f)" % arocauc)
+    pp.plot([0, 1], [1, 1], "y--")
+    pp.plot([0, 1], [0, 1], "r--")
+    pp.legend(loc="lower right")
 
-        img = cv2.resize(frame, (224, 224), fx=0.5, fy=0.5, interpolation=cv2.INTER_AREA)
-        # img = cv2.resize(frame, (224, 224), fx=0.0, fy=0.0, interpolation=cv2.INTER_AREA)
-        # img = cv2.resize(frame, (224, 224))
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        img = img / 255
-        expanded_img = np.expand_dims(img, axis=0)
+    #ax2 = pp.gca().twinx()
+    #ax2.plot(afpr, thresholds, markeredgecolor='r', linestyle='dashed', color='r')
+    #ax2.set_ylabel('Threshold', color='r')
+    #ax2.set_ylim([thresholds[-1], thresholds[0]])
+    #ax2.set_xlim([afpr[0], afpr[-1]])
 
-        start_time = time.time()
+    pp.show()
 
-        pred = model.predict(expanded_img)
-        _cls = class20[np.argmax(pred)]
-        _prob = np.max(pred)
+    pp.figure()
+    pp.plot(1.0 - atpr, thresholds, marker='*', label='tpr')
+    pp.plot(afpr, thresholds, marker='o', label='fpr')
+    pp.legend()
+    pp.xlim([0, 1])
+    pp.ylim([0, 1])
+    pp.xlabel('thresh')
+    pp.ylabel('far/fpr')
+    pp.title(' thresh - far/fpr')
+    pp.show()
 
-        font_color = (0, 0, 0)
-        label = 'Prediction : ...'
+    for threval in np.arange(0.5, 1.0, 0.05):
+        predictval = (ascores > threval)
 
-        if _prob > THESHOLD:
-            font_color = (0, 0, 255)
-            label = '{} Prediction : {} ({:.2f}%)'.format(fname, _cls.upper(), _prob * 100)
-        else:
-            label = '{} Prediction : {} ({:.2f}%)'.format(fname, "Unknown", 0)
+        TP, FP, TN, FN = perf_measure(alable, predictval)
 
-        #cv2.putText(frame, label, TEXT_LOC, cv2.FONT_HERSHEY_SIMPLEX, FONT_SIZE, font_color, 2)
+        FACC = accuracy_score(alable, predictval)
+        FFAR = FP / float(FP + TN)
+        FFRR = FN / float(TP + FN)
 
-        print(label)
+        #ftar =  precision_score(alable, predictval)
+        #ffar = recall_score(alable, predictval)
 
-        if binit == False:
-            binit = True
-            continue
+        print("Threshold: %.2f Accuracy : %.2f  FAR: %.2f FRR: %.2f" %(threval ,FACC, FFAR,FFRR))
 
-        totaltime += (time.time() - start_time)
-        gds = gpustatus()
-        cds = cpustatus()
-        totalgusage += gds["util"]
-        totalgram += gds["mem_used"]
-        totalgper += gds["mem_used_per"]
-
-        totalcusage += cds["util"]
-        totalcram += cds["mem_used"]
-        totalcper += cds["mem_used_per"]
-
-    fps = 1.0 / (totaltime / count)
-
-    totalgusage /= count
-    totalgram /= count
-    totalgper /= count
-
-    totalcusage /= count
-    totalcram /= count
-    totalcper /= count
-
-    print("\n===================================\n")
-    laststr = "FPS:{0:.2f} GPU:{1:.2f}% CPU:{2:.2f}% GPU RAM:{3:.2f} MiB {4:.2f}% CPU RAM:{5:.2f} MiB {6:.2f}%".format(
-        fps, totalgusage, totalcusage, totalgram, totalgper, totalcram, totalcper)
-    print(laststr)
-    print("\n===================================\n")
-
-
+    print("task complete!")
 
 if __name__== "__main__":
     main()

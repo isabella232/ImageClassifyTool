@@ -292,7 +292,8 @@ if __name__=="__main__":
     totalcper = 0.0
 
     fileset = [file for file in glob.glob(testdir + "**/*.jpg", recursive=True)]
-    count = len(fileset)
+    count = len(fileset) - 1
+    binit = False
 
     for file in fileset:
 
@@ -301,6 +302,10 @@ if __name__=="__main__":
         print(fname + ": ")
         r_image, ObjectsList = yolo.detect_img(file)
         print(ObjectsList)
+
+        if binit == False:
+            binit = True
+            continue
 
         totaltime += (time.time() - start_time)
         gds = gpustatus()
