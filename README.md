@@ -56,9 +56,9 @@ Enter “dataclassify” directory.
  cd dataclassify
 Execute following python script.
 
- python3 imagedoenloder.py --urls=urls_1.txt --dir=class01
+ python3 imagedownloder.py --urls=urls_1.txt --dir=class01
 
- python3 imagedoenloder.py --urls=urls_2.txt --dir=class02
+ python3 imagedownloder.py --urls=urls_2.txt --dir=class02
  
 This script download to class02 directory all images from URL list.
 And add images which downloaded from google image search and grabbed from video.
