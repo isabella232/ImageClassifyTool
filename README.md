@@ -48,9 +48,7 @@ Now enter the ImageClassifyTool directory.
 **Data collection**
 
 First, we need image data for training. As mentioned above there are several ways for scrap image data set. Here wrote download python script for download from URL list.
-Enter “dataclassify” directory.
- cd dataclassify
-Run following python script.
+Enter “dataclassify” directory and run following python script.
 
 ```
 	 python3 imagedownloder.py --urls=urls_1.txt --dir=class01
@@ -105,7 +103,8 @@ For test we have to copy this file to “model_data” directory.
 **Fine-Tuning**
 
 If you want to do fine-tune the trained model to improve accuracy or add other class then you can run the following command.
-Before do fine-tune, you need to check the accuracy of the training data and the number of classifications and  it should be noted that the size of the input image should be consistent with the original model.
+Before do fine-tune, you need to check the accuracy of the training data and the number of classifications and  it should be noted that the size of the input image should be consistent with the original model. You can download a pre-trained model to classify adult, soccer and other [here](https://drive.google.com/file/d/1_DLrSE2ebeexrgOEds-3Od45Nq_KLQlz/view?usp=sharing).
+
 ```
 	python3 trainclassify.py --classes=3 --size=224 --batch=64 --epochs=100 --weights=trained_model.h5 --tclasses=2
 ```
