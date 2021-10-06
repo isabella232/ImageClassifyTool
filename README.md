@@ -5,7 +5,7 @@ All steps to build the training and test environment have been tested on ubuntu1
 **First install python 3.6 or later.**
 
 ```
-	sudo apt install python3.6	
+	sudo apt install python3.6
 	sudo apt install -y python3-pip
 ```
 	
@@ -50,7 +50,7 @@ Now enter the ImageClassifyTool directory.
 First, we need image data for training. As mentioned above there are several ways for scrap image data set. Here wrote download python script for download from URL list.
 Enter “dataclassify” directory.
  cd dataclassify
-Execute following python script.
+Run following python script.
 
 ```
 	 python3 imagedownloder.py --urls=urls_1.txt --dir=class01
@@ -65,18 +65,18 @@ At least 10k images are recommended for training.
 
 Once the image is ready, we have to split two set. One is train other one is validation set.
 In addition, for training we have to convert images to 224X224 pixel images. 
-Execute following python script.
+Run following python script.
 
 ```
 	python3 imagesplitetrain.py --infolder class01 --classname 0
 	python3 imagesplitetrain.py --infolder class02 --classname 1
 ```
 
-After execute this script we can confirm “train” and “validation” directories.
+After run this script we can confirm “train” and “validation” directories.
 
 **Training the classifier**
 
-Now we can start training. Enter the work root directory.
+Now we can start training. Enter the root directory for working.
 
 ```
 	python3 trainclassify.py --classes=2 --size=224 --batch=64 --epochs=100 --weights=False --tclasses=0
@@ -93,18 +93,26 @@ Now we can start training. Enter the work root directory.
 	--tclasses, The number of classes of pre-trained model.
 ```	
 
-In our case –weights and –tclasses parameter is False and 0, because don’t use pre-trained model.
-If completed training then we can find trained model file in  “model_training/logclassify” directory.
-This file name is “trained_classifymodel.h5”. 
-For test we copy this file to “model_data” directory.
+Here –weights and –tclasses parameter is False and 0, because don’t use pre-trained model.
+If the training is completed then we can find trained model file in “model_training/logclassify” directory and 
+the file name is “trained_classifymodel.h5”.
+For test we have to copy this file to “model_data” directory.
 
 ```
-	cp model_training/logclassify/ trained_classifymodel.h5 directory model_data/trained_classifymodel.h5
+	cp model_training/logclassify/trained_classifymodel.h5 model_data/trained_classifymodel.h5
+```
+
+**Fine-Tuning**
+
+If you want to do fine-tune the trained model to improve accuracy or add other class then you can run the following command.
+Before do fine-tune, you need to check the accuracy of the training data and the number of classifications and  it should be noted that the size of the input image should be consistent with the original model.
+```
+	python3 trainclassify.py --classes=3 --size=224 --batch=64 --epochs=100 --weights=trained_model.h5 --tclasses=2
 ```
 
 **Test and Result**
 
-Place the images you want to test in the "testclassify" directory and execute following python script.
+Place the images you want to test in the "testclassify" directory and run following python script.
 
 ```
 	python3 image_classify.py
@@ -155,7 +163,7 @@ Here we don't discuss about this.
 
 **Training**
 
-Now we can start training. Enter work root directory and execute following script.
+Now we can start training. Enter work root directory and run following script.
 ```
 	python3 traindetect.py
 ```
@@ -170,7 +178,7 @@ For test we copy this file to “model_data” directory.
 
 **Test**
 
-Place the images you want to test in the "testdetect" directory. Execute following python script.
+Place the images you want to test in the "testdetect" directory and run following python script.
 
 ```
 	python3 image_detect.py
@@ -178,7 +186,7 @@ Place the images you want to test in the "testdetect" directory. Execute followi
 
 # 3. Trouble Shooting
 
-**cannot import cv2****
+**cannot import cv2**
 ```
 	pip install opencv-python
 ```
